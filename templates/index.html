@@ -17,32 +17,34 @@
         }
         </style>
 
-        <title>Bike Usage Model</title>
+        <title>Water Supply Forecasts</title>
     </head>
 
     <body>
-
-        <!-- Use the action attribute to call the 'main' function -->
         <form action="{{ url_for('main') }}" method="POST">
-        <fieldset>
-            <legend>Input values:</legend>
-            Temperature:
-            <!-- Required attribute is used to make sure people input values -->
-            <input name="temperature" type="number" required>
-            <br>
-            <br> Humidity:
-            <input name="humidity" type="number" required>
-            <br>
-            <br> Windspeed:
-            <input name="windspeed" type="number" required>
-            <br>
-            <br>
-            <input type="submit">
-        </fieldset>
-        </form>
+        <!-- Use the action attribute to call the 'main' function -->
+            <h3>Choose a Site</h3>
+                <select name="site" id="site">
+                  <option value="black_rock">Black Rock Reservoir</option>
+                  <option value="saab">Saab</option>
+                  <option value="mercedes">Mercedes</option>
+                  <option value="audi">Audi</option>
+                </select>
 
         <br>
+            <h3>Choose a Period to Forecast (Months)</h3>
+                <select name="period" id="period">
+                      <option value="1">1 Month</option>
+                      <option value="3">3 Months</option>
+                      <option value="6">6 Months</option>
+                      <option value="12">1 Year</option>
+                      <option value="24">2 Years</option>
 
+                </select>
+
+        <br>
+            <input type="submit">
+                    </form>
         <div class="result" align="center">
 
             <!-- Our 'result' is false until a prediction has been made -->
@@ -50,12 +52,14 @@
 
                 <!-- Loop through dictionary and print key:value pair -->
                 {% for variable in original_input %}
-                    <b>{{ variable }}:</b> {{ original_input[variable] }}
+                    <b>{{ variable }}:</b> {{ original_input[variable] }} <br>
                 {% endfor %}
                 <br>
                 <!-- Print prediction -->
-                <br> Predicted number of bikes in use:
-                <p style="font-size:50px">{{ result }}</p>
+            <h2>Here's a number</h2>
+            <h3>{{result}}</h3>
+                <br> <h2>Here's a plot of the current situation:</h2>
+            <img src={{image}} alt="Chart" height="auto" width="100%">
 
             {% endif %}
         </div>
