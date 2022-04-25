@@ -62,7 +62,6 @@ def draw_plot_decomp(df, site):
 def create_figure_decomp(df, site):
     result = sm.tsa.seasonal_decompose(df['value'], model='additive')
     fig, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(16, 12))
-    plt.title(f"Volume of water in acre-feet at {site}")
     fig.patch.set_facecolor('#E8E5DA')
     fig.suptitle(f"Decomposition plots for {site}")
     result.trend.plot(ax=ax1, title="Trend", color="#304C89").xaxis.label.set_visible(False)
@@ -90,16 +89,10 @@ def create_figure_pred(data, site, period):
     model.fit(df)
     forecast = model.make_future_dataframe(periods=int(period), freq='MS')
     forecast = model.predict(forecast)
-    plt.figure(figsize=(18, 6))
-    model.plot(forecast, xlabel='Date', ylabel='Mean Water Level')
-    plt.title('FB Prophet - Black Rock Reservoir Water Level')
-    fig, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(16, 12))
-    plt.title(f"Volume of water in acre-feet at {site}")
+    fig, ax = plt.subplots(figsize=(8, 4))
     fig.patch.set_facecolor('#E8E5DA')
-    fig.suptitle(f"Decomposition plots for {site}")
-    result.trend.plot(ax=ax1, title="Trend", color="#304C89").xaxis.label.set_visible(False)
-    result.resid.plot(ax=ax2, title="Residuals", color="#304C89").xaxis.label.set_visible(False)
-    result.seasonal.plot(ax=ax3, title="Seasonal Component", color="#304C89").xaxis.label.set_visible(False)
+    model.plot(forecast, xlabel='Date', ylabel='Mean Water Level', ax=ax);
+    plt.title(f'FB Prophet - Water Level at {site}')
     return fig
 
 def adfuller_test(sales):
