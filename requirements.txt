@@ -1,4 +1,4 @@
-click==8.1.2
+click
 cmdstanpy==0.4.0
 convertdate==2.4.0
 cramjam==2.5.0
