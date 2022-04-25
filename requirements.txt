@@ -28,3 +28,4 @@ Werkzeug==2.1.1
 zipp==3.8.0
 
 statsmodels~=0.13.2
+prophet

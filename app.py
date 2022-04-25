@@ -11,7 +11,7 @@ import io
 import base64
 import pandas as pd
 import statsmodels.api as sm
-from fbprophet import Prophet
+# from fbprophet import Prophet
 
 # Initialise the Flask app
 app = Flask(__name__)
@@ -82,13 +82,13 @@ def draw_plot_pred(data, site):
 
     return png_image_b64_string
 
-def create_figure_pred(data, site):
+def create_figure_pred(data, site, period):
     df = pd.DataFrame()
     df['ds'] = data['dateTime'].dt.tz_localize(None)
     df['y'] = data['value']
     model = Prophet()
     model.fit(df)
-    forecast = model.make_future_dataframe(periods=36, freq='MS')
+    forecast = model.make_future_dataframe(periods=period, freq='MS')
     forecast = model.predict(forecast)
     plt.figure(figsize=(18, 6))
     model.plot(forecast, xlabel='Date', ylabel='Mean Water Level')
@@ -141,6 +141,7 @@ def main():
         stationarity_summary = adfuller_test(data['value'])
         current_image = draw_plot_current(data, site)
         decomp_image = draw_plot_decomp(data, site)
+        predict_image = draw_plot_pred(data, site, period)
         # We now pass on the input from the from and the prediction to the index page
         return render_template("index.html",
                                original_input={'Site': site,
@@ -148,7 +149,8 @@ def main():
                                stationarity_summary=stationarity_summary,
                                latest_reading=latest_reading,
                                current_image=current_image,
-                               decomp_image=decomp_image
+                               decomp_image=decomp_image,
+                               predict_image=predict_image
                                )
     # If the request method is GET
     return render_template('index.html')
