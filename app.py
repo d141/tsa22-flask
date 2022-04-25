@@ -11,15 +11,15 @@ import io
 import base64
 import pandas as pd
 import statsmodels.api as sm
-# from fbprophet import Prophet
+from fbprophet import Prophet
 
 # Initialise the Flask app
 app = Flask(__name__)
 app.debug = True
 
-# Use pickle to load in the pre-trained model
-filename = "models/model.sav"
-model = pickle.load(open(filename, "rb"))
+# # Use pickle to load in the pre-trained model
+# filename = "models/model.sav"
+# model = pickle.load(open(filename, "rb"))
 
 
 # @app.route('/draw_plot/', methods=['GET', 'POST'])
