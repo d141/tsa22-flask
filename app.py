@@ -70,8 +70,8 @@ def create_figure_decomp(df, site):
     result.seasonal.plot(ax=ax3, title="Seasonal Component", color="#304C89").xaxis.label.set_visible(False)
     return fig
 
-def draw_plot_pred(data, site):
-    fig = create_figure_pred(data, site)
+def draw_plot_pred(data, site, period):
+    fig = create_figure_pred(data, site, period)
     # Convert plot to PNG image
     png_image = io.BytesIO()
     FigureCanvas(fig).print_png(png_image)
