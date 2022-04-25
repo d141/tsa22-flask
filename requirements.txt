@@ -1,6 +1,6 @@
 click
 cmdstanpy==0.4.0
-convertdate==2.4.0
+convertdate
 cramjam==2.5.0
 cycler==0.11.0
 Cython==0.29.28
