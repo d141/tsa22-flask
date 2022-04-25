@@ -88,7 +88,7 @@ def create_figure_pred(data, site, period):
     df['y'] = data['value']
     model = Prophet()
     model.fit(df)
-    forecast = model.make_future_dataframe(periods=period, freq='MS')
+    forecast = model.make_future_dataframe(periods=int(period), freq='MS')
     forecast = model.predict(forecast)
     plt.figure(figsize=(18, 6))
     model.plot(forecast, xlabel='Date', ylabel='Mean Water Level')
