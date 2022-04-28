@@ -82,12 +82,14 @@ def create_figure_pred(data, site, period, model_name):
     df = pd.DataFrame()
     df['ds'] = data['dateTime'].dt.tz_localize(None)
     df['y'] = data['value']
-    # filename = f"models/{model_name}"
-    # model = pickle.load(open(filename, 'rb'))
-    model = Prophet()
-    model.fit(df)
+    # model = Prophet()
+    # model.fit(df)
+
+    filename = f"models/{model_name}"
+    model = pickle.load(open(filename, 'rb'))
     forecast = model.make_future_dataframe(periods=int(period), freq='MS')
     forecast = model.predict(forecast)
+
     fig, ax = plt.subplots(figsize=(16, 12))
     fig.patch.set_facecolor('#E8E5DA')
     model.plot(forecast, xlabel='Date', ylabel='Mean Water Level', ax=ax);
