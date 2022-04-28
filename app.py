@@ -10,7 +10,6 @@ import matplotlib.pyplot as plt
 import io
 import base64
 import pandas as pd
-import pandas._libs.arrays
 import statsmodels.api as sm
 from fbprophet import Prophet
 import pickle
