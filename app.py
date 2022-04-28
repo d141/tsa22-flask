@@ -83,8 +83,10 @@ def create_figure_pred(data, site, period, model_name):
     df = pd.DataFrame()
     df['ds'] = data['dateTime'].dt.tz_localize(None)
     df['y'] = data['value']
-    filename = f"models/{model_name}"
-    model = pickle.load(open(filename, 'rb'))
+    # filename = f"models/{model_name}"
+    # model = pickle.load(open(filename, 'rb'))
+    model = Prophet()
+    model.fit(df)
     forecast = model.make_future_dataframe(periods=int(period), freq='MS')
     forecast = model.predict(forecast)
     fig, ax = plt.subplots(figsize=(16, 12))
