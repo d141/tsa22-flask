@@ -25,6 +25,7 @@ numpy
 packaging
 pandas
 patsy
+pickle
 Pillow
 plotly
 pyarrow

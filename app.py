@@ -12,14 +12,11 @@ import base64
 import pandas as pd
 import statsmodels.api as sm
 from fbprophet import Prophet
+import pickle
 
 # Initialise the Flask app
 app = Flask(__name__)
 app.debug = True
-
-# # Use pickle to load in the pre-trained model
-# filename = "models/model.sav"
-# model = pickle.load(open(filename, "rb"))
 
 
 # @app.route('/draw_plot/', methods=['GET', 'POST'])
@@ -69,8 +66,8 @@ def create_figure_decomp(df, site):
     result.seasonal.plot(ax=ax3, title="Seasonal Component", color="#304C89").xaxis.label.set_visible(False)
     return fig
 
-def draw_plot_pred(data, site, period):
-    fig = create_figure_pred(data, site, period)
+def draw_plot_pred(data, site, period, model_name):
+    fig = create_figure_pred(data, site, period, model_name)
     # Convert plot to PNG image
     png_image = io.BytesIO()
     FigureCanvas(fig).print_png(png_image)
@@ -81,15 +78,15 @@ def draw_plot_pred(data, site, period):
 
     return png_image_b64_string
 
-def create_figure_pred(data, site, period):
+def create_figure_pred(data, site, period, model_name):
     df = pd.DataFrame()
     df['ds'] = data['dateTime'].dt.tz_localize(None)
     df['y'] = data['value']
-    model = Prophet()
-    model.fit(df)
+    filename = f"models/{model_name}"
+    model = pickle.load(open(filename, 'rb'))
     forecast = model.make_future_dataframe(periods=int(period), freq='MS')
     forecast = model.predict(forecast)
-    fig, ax = plt.subplots(figsize=(8, 4))
+    fig, ax = plt.subplots(figsize=(16, 12))
     fig.patch.set_facecolor('#E8E5DA')
     model.plot(forecast, xlabel='Date', ylabel='Mean Water Level', ax=ax);
     plt.title(f'FB Prophet - Water Level at {site}')
@@ -114,16 +111,16 @@ def main():
         # Extract the input from the form
         site = request.form.get("site")
         period = request.form.get("period")
-        input_to_filename = {'Lake Havasu': 'LAKE HAVASU NEAR PARKER DAM, AZ-CA',
-                             'Lake Tahoe': 'LAKE TAHOE A TAHOE CITY CA',
-                             'Tulloch Reservoir': 'TULLOCH RES NR KNIGHTS FERRY CA',
-                             'El Capitan Reservoir': 'EL CAPITAN RES NR LAKESIDE CA',
-                             'Independence Lake': 'INDEPENDENCE LK NR TRUCKEE CA',
-                             'San Antonio Reservoir': 'SAN ANTONIO RESERVOIR NR SUNOL CA',
-                             'San Vicente Reservoir': 'SAN VICENTE RES NR LAKESIDE CA',
-                             'Salton Sea': 'SALTON SEA NR WESTMORLAND CA'}
+        input_to_filename = {'Lake Havasu': ('LAKE HAVASU NEAR PARKER DAM, AZ-CA', "lake_havasu_model"),
+                             'Lake Tahoe': ('LAKE TAHOE A TAHOE CITY CA', "lake_tahoe_model"),
+                             'Vail Lake': ('VAIL LK NR TEMECULA CA', 'vail_lake_model'),
+                             'El Capitan Reservoir': ('EL CAPITAN RES NR LAKESIDE CA', 'el_capitan_model'),
+                             'San Andreas Lake': ('SAN ANDREAS LAKE A DAM NR MILLBRAE CA', 'san_andreas_model'),
+                             'San Antonio Reservoir': ('SAN ANTONIO RESERVOIR NR SUNOL CA','san_antonio_model'),
+                             'San Vicente Reservoir': ('SAN VICENTE RES NR LAKESIDE CA', 'san_vicente_model'),
+                             }
         data = pd.read_parquet('data/lakes_in_ca.parquet')
-        data = data[data['siteName'] == input_to_filename[site]]
+        data = data[data['siteName'] == input_to_filename[site][0]]
         data = data.sort_values(by="dateTime")
         data = data.set_index(data.dateTime)
         #data = data.drop(columns=['dateTime', 'siteName'])
@@ -134,7 +131,8 @@ def main():
         stationarity_summary = adfuller_test(data['value'])
         current_image = draw_plot_current(data, site)
         decomp_image = draw_plot_decomp(data, site)
-        predict_image = draw_plot_pred(data, site, period)
+        model_name = input_to_filename[site][1]
+        predict_image = draw_plot_pred(data, site, period, model_name)
         # We now pass on the input from the from and the prediction to the index page
         return render_template("index.html",
                                original_input={'Site': site,
