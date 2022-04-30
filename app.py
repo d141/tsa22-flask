@@ -11,8 +11,7 @@ import io
 import base64
 import pandas as pd
 import statsmodels.api as sm
-from fbprophet import Prophet
-import pickle
+
 
 # Initialise the Flask app
 app = Flask(__name__)
@@ -66,36 +65,6 @@ def create_figure_decomp(df, site):
     result.seasonal.plot(ax=ax3, title="Seasonal Component", color="#304C89").xaxis.label.set_visible(False)
     return fig
 
-def draw_plot_pred(data, site, period, model_name):
-    fig = create_figure_pred(data, site, period, model_name)
-    # Convert plot to PNG image
-    png_image = io.BytesIO()
-    FigureCanvas(fig).print_png(png_image)
-
-    # Encode PNG image to base64 string
-    png_image_b64_string = "data:image/png;base64,"
-    png_image_b64_string += base64.b64encode(png_image.getvalue()).decode('utf8')
-
-    return png_image_b64_string
-
-def create_figure_pred(data, site, period, model_name):
-    df = pd.DataFrame()
-    df['ds'] = data['dateTime'].dt.tz_localize(None)
-    df['y'] = data['value']
-    # model = Prophet()
-    # model.fit(df)
-
-    filename = f"models/{model_name}"
-    model = pickle.load(open(filename, 'rb'))
-    forecast = model.make_future_dataframe(periods=int(period), freq='MS')
-    forecast = model.predict(forecast)
-
-    fig, ax = plt.subplots(figsize=(16, 12))
-    fig.patch.set_facecolor('#E8E5DA')
-    model.plot(forecast, xlabel='Date', ylabel='Mean Water Level', ax=ax);
-    plt.title(f'FB Prophet - Water Level at {site}')
-    return fig
-
 def adfuller_test(sales):
     result=sm.tsa.stattools.adfuller(sales)
     labels = ['ADF Test Statistic','p-value','#Lags Used','Number of Observations Used']
@@ -136,7 +105,7 @@ def main():
         current_image = draw_plot_current(data, site)
         decomp_image = draw_plot_decomp(data, site)
         model_name = input_to_filename[site][1]
-        predict_image = draw_plot_pred(data, site, period, model_name)
+        predict_image = f"../static/images/{site[0]}_{period}.png"
         # We now pass on the input from the from and the prediction to the index page
         return render_template("index.html",
                                original_input={'Site': site,

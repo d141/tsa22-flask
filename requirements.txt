@@ -30,7 +30,6 @@ plotly
 pyarrow
 PyMeeus
 pyparsing
-pystan==2.19.1.1
 python-dateutil
 pytz
 scipy
@@ -43,5 +42,3 @@ tqdm
 ujson
 Werkzeug
 zipp
-
-fbprophet
