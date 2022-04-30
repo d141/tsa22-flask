@@ -1,8 +1,5 @@
-from flask import Flask, render_template, request, Response
-import pickle
-import pandas as pd
+from flask import Flask, render_template, request
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
-from matplotlib.figure import Figure
 import matplotlib
 
 matplotlib.use('Agg')
@@ -13,12 +10,12 @@ import pandas as pd
 import statsmodels.api as sm
 
 
+
 # Initialise the Flask app
 app = Flask(__name__)
 app.debug = True
 
 
-# @app.route('/draw_plot/', methods=['GET', 'POST'])
 def draw_plot_current(df, site):
     fig = create_figure_current(df, site)
     # Convert plot to PNG image
@@ -96,16 +93,12 @@ def main():
         data = data[data['siteName'] == input_to_filename[site][0]]
         data = data.sort_values(by="dateTime")
         data = data.set_index(data.dateTime)
-        #data = data.drop(columns=['dateTime', 'siteName'])
         data['value'] = data['value'].fillna(value=None, method='backfill', axis=None, limit=None, downcast=None)
-        # Get the model's prediction
-        # Given that the prediction is stored in an array we simply extract by indexing
         latest_reading = data.tail(1).value.values[0]
         stationarity_summary = adfuller_test(data['value'])
         current_image = draw_plot_current(data, site)
         decomp_image = draw_plot_decomp(data, site)
-        model_name = input_to_filename[site][1]
-        predict_image = f"../static/images/{site[0]}_{period}.png"
+        image_file = f"{input_to_filename[site][0]}_{period}.png"
         # We now pass on the input from the from and the prediction to the index page
         return render_template("index.html",
                                original_input={'Site': site,
@@ -114,7 +107,7 @@ def main():
                                latest_reading=latest_reading,
                                current_image=current_image,
                                decomp_image=decomp_image,
-                               predict_image=predict_image
+                               predict_image=image_file
                                )
     # If the request method is GET
     return render_template('index.html')
